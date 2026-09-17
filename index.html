@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f3ee" />
+    <meta name="description" content="一个简洁、专注的本地 Todo List。" />
+    <title>今日清单 · Todo List</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">MY DAILY FOCUS</p>
+          <h1>今日清单<span class="dot">.</span></h1>
+          <p id="today" class="date-line"></p>
+        </div>
+        <div class="progress-orbit" aria-label="完成进度">
+          <svg viewBox="0 0 72 72" aria-hidden="true">
+            <circle class="progress-track" cx="36" cy="36" r="30"></circle>
+            <circle id="progress-ring" class="progress-ring" cx="36" cy="36" r="30"></circle>
+          </svg>
+          <span id="progress-value">0%</span>
+        </div>
+      </header>
+
+      <section class="todo-card" aria-labelledby="list-title">
+        <h2 id="list-title" class="sr-only">任务列表</h2>
+        <form id="todo-form" class="add-form">
+          <label class="sr-only" for="todo-input">添加新任务</label>
+          <input id="todo-input" maxlength="120" autocomplete="off" placeholder="接下来要完成什么？" />
+          <button class="add-button" type="submit" aria-label="添加任务">
+            <span aria-hidden="true">＋</span><span>添加任务</span>
+          </button>
+        </form>
+        <p id="form-error" class="form-error" role="alert"></p>
+
+        <div class="toolbar">
+          <div class="filters" role="group" aria-label="筛选任务">
+            <button class="filter active" data-filter="all" type="button">全部</button>
+            <button class="filter" data-filter="active" type="button">待完成</button>
+            <button class="filter" data-filter="completed" type="button">已完成</button>
+          </div>
+          <button id="clear-completed" class="text-button" type="button">清除已完成</button>
+        </div>
+
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-icon" aria-hidden="true">✓</div>
+          <h3>这里很清爽</h3>
+          <p>写下一个小目标，开始今天的进度。</p>
+        </div>
+        <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
+
+        <footer class="summary">
+          <span id="remaining-count">0 项待完成</span>
+          <span id="completed-count">已完成 0 项</span>
+        </footer>
+      </section>
+      <p class="footnote">每完成一件小事，都离理想的一天更近。</p>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
