@@ -56,9 +56,12 @@ document.querySelector('#clear-completed').addEventListener('click', () => {
 list.addEventListener('click', (event) => {
   const item = event.target.closest('.todo-item');
   if (!item) return;
+  if (event.target.closest('.edit-button')) {
+    startEditing(item);
+    return;
+  }
   if (event.target.closest('.toggle')) todos = toggleTodo(todos, item.dataset.id);
   if (event.target.closest('.delete-button')) todos = removeTodo(todos, item.dataset.id);
-  if (event.target.closest('.edit-button')) startEditing(item);
   commit();
 });
 
@@ -74,7 +77,9 @@ function startEditing(item) {
   editor.focus();
   editor.select();
 
+  let cancelled = false;
   const finish = () => {
+    if (cancelled) return;
     try {
       todos = editTodo(todos, id, editor.value);
       commit();
@@ -82,10 +87,13 @@ function startEditing(item) {
       editor.focus();
     }
   };
-  editor.addEventListener('blur', finish, { once: true });
+  editor.addEventListener('blur', finish);
   editor.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') editor.blur();
-    if (event.key === 'Escape') render();
+    if (event.key === 'Escape') {
+      cancelled = true;
+      render();
+    }
   });
 }
 
