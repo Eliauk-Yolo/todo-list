@@ -127,6 +127,15 @@ function render() {
   progressRing.style.strokeDashoffset = circumference * (1 - percentage / 100);
 }
 
+function formatCreatedDate(createdAt) {
+  if (typeof createdAt !== 'number' || !Number.isFinite(createdAt)) return '';
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return '';
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return '[' + month + '-' + day + ']';
+}
+
 function createTodoItem(todo) {
   const item = document.createElement('li');
   item.className = `todo-item${todo.completed ? ' completed' : ''}`;
@@ -140,7 +149,7 @@ function createTodoItem(todo) {
 
   const text = document.createElement('span');
   text.className = 'todo-text';
-  text.textContent = todo.text;
+  text.textContent = formatCreatedDate(todo.createdAt) + todo.text;
 
   const actions = document.createElement('div');
   actions.className = 'todo-actions';

@@ -185,3 +185,100 @@ test('a corrected value can save after whitespace is rejected on blur', async (t
   editor.blur();
   assert.equal(env.storedTodos()[0].text, 'Corrected task');
 });
+
+function visibleTaskTexts(env) {
+  return env.list.children.map((item) => item.querySelector('.todo-text').textContent);
+}
+
+function clickTaskAction(env, selector) {
+  const item = env.list.children[0];
+  const target = {
+    closest(value) {
+      if (value === '.todo-item') return item;
+      if (value === selector) return this;
+      return null;
+    },
+  };
+  env.list.dispatch('click', { target });
+}
+
+function selectFilter(env, filter) {
+  const button = { dataset: { filter } };
+  const target = {
+    closest(selector) {
+      return selector === '[data-filter]' ? button : null;
+    },
+  };
+  env.document.querySelector('.filters').dispatch('click', { target });
+}
+
+test('created dates stay separate from titles through edits, filters, status changes, and reload', async (t) => {
+  const env = createEnvironment();
+  const createdAt = new Date(2026, 10, 3, 12).getTime();
+  const olderCreatedAt = new Date(2026, 1, 9, 12).getTime();
+  env.localStorage.setItem(STORAGE_KEY, JSON.stringify([
+    { id: 'live-class', text: '听直播课', completed: false, createdAt },
+    { id: 'older-task', text: '较早任务', completed: false, createdAt: olderCreatedAt },
+  ]));
+  await boot(t, env);
+
+  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课', '[02-09]较早任务']);
+
+  clickEdit(env);
+  const editor = env.list.querySelector('.edit-input');
+  assert.equal(editor.value, '听直播课', 'the editor should contain only the stored title');
+  editor.value = '听直播课笔记';
+  editor.dispatch('keydown', { key: 'Enter' });
+
+  assert.equal(visibleTaskTexts(env)[0], '[11-03]听直播课笔记');
+  assert.deepEqual(env.storedTodos()[0], {
+    id: 'live-class',
+    text: '听直播课笔记',
+    completed: false,
+    createdAt,
+  });
+
+  clickTaskAction(env, '.toggle');
+  assert.equal(visibleTaskTexts(env)[0], '[11-03]听直播课笔记');
+  assert.equal(env.storedTodos()[0].completed, true);
+  assert.equal(env.storedTodos()[0].createdAt, createdAt);
+
+  selectFilter(env, 'active');
+  assert.deepEqual(visibleTaskTexts(env), ['[02-09]较早任务']);
+  selectFilter(env, 'completed');
+  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记']);
+  selectFilter(env, 'all');
+  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记', '[02-09]较早任务']);
+
+  const currentDisplay = visibleTaskTexts(env)[0];
+  clickTaskAction(env, '.toggle');
+  assert.equal(env.storedTodos()[0].completed, false);
+  assert.equal(env.storedTodos()[0].createdAt, createdAt);
+  assert.equal(visibleTaskTexts(env)[0], currentDisplay);
+  clickTaskAction(env, '.toggle');
+  assert.equal(env.storedTodos()[0].completed, true);
+  assert.equal(env.storedTodos()[0].createdAt, createdAt);
+  assert.equal(visibleTaskTexts(env)[0], currentDisplay);
+
+  await import('../app.js?app-edit-case=' + (++importCounter));
+  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记', '[02-09]较早任务']);
+  assert.deepEqual(env.storedTodos()[0], {
+    id: 'live-class',
+    text: '听直播课笔记',
+    completed: true,
+    createdAt,
+  });
+});
+
+test('legacy tasks without a valid creation timestamp keep their original title', async (t) => {
+  const env = createEnvironment();
+  env.localStorage.setItem(STORAGE_KEY, JSON.stringify([
+    { id: 'missing-date', text: '缺少日期', completed: false },
+    { id: 'string-date', text: '字符串日期', completed: false, createdAt: '2026-11-03' },
+    { id: 'null-date', text: '空日期', completed: false, createdAt: null },
+    { id: 'out-of-range-date', text: '越界日期', completed: false, createdAt: 8.64e15 + 1 },
+  ]));
+  await boot(t, env);
+
+  assert.deepEqual(visibleTaskTexts(env), ['缺少日期', '字符串日期', '空日期', '越界日期']);
+});
