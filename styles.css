@@ -59,6 +59,8 @@ h1 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(2
 .todo-item:hover { background: rgba(243, 240, 233, .5); }
 .toggle { width: 23px; height: 23px; padding: 0; border: 1.5px solid #bbb7ad; border-radius: 50%; color: transparent; background: transparent; line-height: 20px; transition: .2s; }
 .completed .toggle { border-color: var(--sage); color: white; background: var(--sage); }
+.todo-content { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.todo-date { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; min-width: 50px; height: 24px; padding: 0 7px; border-radius: 7px; color: #607565; background: #edf2ec; font-size: .75rem; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1; white-space: nowrap; }
 .todo-text { min-width: 0; overflow-wrap: anywhere; }
 .completed .todo-text { color: #96988f; text-decoration: line-through; text-decoration-thickness: 1.5px; }
 .todo-actions { display: flex; gap: 3px; opacity: 0; transition: opacity .2s; }
@@ -85,6 +87,7 @@ h1 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(2
   .filter { padding-inline: 10px; }
   .text-button { max-width: 58px; text-align: right; }
   .todo-item { padding-inline: 16px; }
+  .todo-content { flex-direction: column; align-items: flex-start; gap: 5px; }
   .todo-actions { opacity: 1; }
   .summary { padding-inline: 16px; }
 }

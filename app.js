@@ -128,12 +128,17 @@ function render() {
 }
 
 function formatCreatedDate(createdAt) {
-  if (typeof createdAt !== 'number' || !Number.isFinite(createdAt)) return '';
+  if (typeof createdAt !== 'number' || !Number.isFinite(createdAt)) return null;
   const date = new Date(createdAt);
-  if (Number.isNaN(date.getTime())) return '';
+  if (Number.isNaN(date.getTime())) return null;
+  const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return '[' + month + '-' + day + ']';
+  return {
+    short: `${month}.${day}`,
+    full: `${year}-${month}-${day}`,
+    spoken: `创建于${year}年${date.getMonth() + 1}月${date.getDate()}日`,
+  };
 }
 
 function createTodoItem(todo) {
@@ -147,16 +152,30 @@ function createTodoItem(todo) {
   toggle.setAttribute('aria-label', todo.completed ? '标记为待完成' : '标记为已完成');
   toggle.innerHTML = '<span aria-hidden="true">✓</span>';
 
+  const content = document.createElement('span');
+  content.className = 'todo-content';
+
+  const createdDate = formatCreatedDate(todo.createdAt);
+  if (createdDate) {
+    const date = document.createElement('time');
+    date.className = 'todo-date';
+    date.textContent = createdDate.short;
+    date.setAttribute('datetime', createdDate.full);
+    date.setAttribute('aria-label', createdDate.spoken);
+    content.append(date);
+  }
+
   const text = document.createElement('span');
   text.className = 'todo-text';
-  text.textContent = formatCreatedDate(todo.createdAt) + todo.text;
+  text.textContent = todo.text;
+  content.append(text);
 
   const actions = document.createElement('div');
   actions.className = 'todo-actions';
   actions.innerHTML = `
     <button type="button" class="icon-button edit-button" aria-label="编辑任务">编辑</button>
     <button type="button" class="icon-button delete-button" aria-label="删除任务">删除</button>`;
-  item.append(toggle, text, actions);
+  item.append(toggle, content, actions);
   return item;
 }
 

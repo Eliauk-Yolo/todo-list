@@ -190,6 +190,14 @@ function visibleTaskTexts(env) {
   return env.list.children.map((item) => item.querySelector('.todo-text').textContent);
 }
 
+function visibleTaskDates(env) {
+  return env.list.children.map((item) => item.querySelector('.todo-date')?.textContent ?? null);
+}
+
+function visibleTaskDateTimes(env) {
+  return env.list.children.map((item) => item.querySelector('.todo-date')?.attributes.get('datetime') ?? null);
+}
+
 function clickTaskAction(env, selector) {
   const item = env.list.children[0];
   const target = {
@@ -212,7 +220,7 @@ function selectFilter(env, filter) {
   env.document.querySelector('.filters').dispatch('click', { target });
 }
 
-test('created dates stay separate from titles through edits, filters, status changes, and reload', async (t) => {
+test('created dates are separate labels that survive edits, filters, status changes, and reload', async (t) => {
   const env = createEnvironment();
   const createdAt = new Date(2026, 10, 3, 12).getTime();
   const olderCreatedAt = new Date(2026, 1, 9, 12).getTime();
@@ -222,7 +230,10 @@ test('created dates stay separate from titles through edits, filters, status cha
   ]));
   await boot(t, env);
 
-  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课', '[02-09]较早任务']);
+  assert.deepEqual(visibleTaskTexts(env), ['听直播课', '较早任务']);
+  assert.deepEqual(visibleTaskDates(env), ['11.03', '02.09']);
+  assert.deepEqual(visibleTaskDateTimes(env), ['2026-11-03', '2026-02-09']);
+  assert.equal(env.list.children[0].querySelector('.todo-date').attributes.get('aria-label'), '创建于2026年11月3日');
 
   clickEdit(env);
   const editor = env.list.querySelector('.edit-input');
@@ -230,7 +241,8 @@ test('created dates stay separate from titles through edits, filters, status cha
   editor.value = '听直播课笔记';
   editor.dispatch('keydown', { key: 'Enter' });
 
-  assert.equal(visibleTaskTexts(env)[0], '[11-03]听直播课笔记');
+  assert.equal(visibleTaskTexts(env)[0], '听直播课笔记');
+  assert.equal(visibleTaskDates(env)[0], '11.03');
   assert.deepEqual(env.storedTodos()[0], {
     id: 'live-class',
     text: '听直播课笔记',
@@ -239,16 +251,20 @@ test('created dates stay separate from titles through edits, filters, status cha
   });
 
   clickTaskAction(env, '.toggle');
-  assert.equal(visibleTaskTexts(env)[0], '[11-03]听直播课笔记');
+  assert.equal(visibleTaskTexts(env)[0], '听直播课笔记');
+  assert.equal(visibleTaskDates(env)[0], '11.03');
   assert.equal(env.storedTodos()[0].completed, true);
   assert.equal(env.storedTodos()[0].createdAt, createdAt);
 
   selectFilter(env, 'active');
-  assert.deepEqual(visibleTaskTexts(env), ['[02-09]较早任务']);
+  assert.deepEqual(visibleTaskTexts(env), ['较早任务']);
+  assert.deepEqual(visibleTaskDates(env), ['02.09']);
   selectFilter(env, 'completed');
-  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记']);
+  assert.deepEqual(visibleTaskTexts(env), ['听直播课笔记']);
+  assert.deepEqual(visibleTaskDates(env), ['11.03']);
   selectFilter(env, 'all');
-  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记', '[02-09]较早任务']);
+  assert.deepEqual(visibleTaskTexts(env), ['听直播课笔记', '较早任务']);
+  assert.deepEqual(visibleTaskDates(env), ['11.03', '02.09']);
 
   const currentDisplay = visibleTaskTexts(env)[0];
   clickTaskAction(env, '.toggle');
@@ -261,7 +277,8 @@ test('created dates stay separate from titles through edits, filters, status cha
   assert.equal(visibleTaskTexts(env)[0], currentDisplay);
 
   await import('../app.js?app-edit-case=' + (++importCounter));
-  assert.deepEqual(visibleTaskTexts(env), ['[11-03]听直播课笔记', '[02-09]较早任务']);
+  assert.deepEqual(visibleTaskTexts(env), ['听直播课笔记', '较早任务']);
+  assert.deepEqual(visibleTaskDates(env), ['11.03', '02.09']);
   assert.deepEqual(env.storedTodos()[0], {
     id: 'live-class',
     text: '听直播课笔记',
@@ -281,4 +298,5 @@ test('legacy tasks without a valid creation timestamp keep their original title'
   await boot(t, env);
 
   assert.deepEqual(visibleTaskTexts(env), ['缺少日期', '字符串日期', '空日期', '越界日期']);
+  assert.deepEqual(visibleTaskDates(env), [null, null, null, null]);
 });
