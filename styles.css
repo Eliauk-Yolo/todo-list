@@ -25,7 +25,8 @@ body {
 
 button, input { font: inherit; }
 button { cursor: pointer; }
-.page-shell { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 36px; }
+.page-shell { position: relative; width: min(1304px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 36px; }
+.main-column { width: min(760px, 100%); margin: 0 auto; }
 .hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 8px 28px; }
 .eyebrow { margin: 0 0 7px; color: var(--accent); font-size: .72rem; font-weight: 800; letter-spacing: .18em; }
 h1 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(2.6rem, 8vw, 4.7rem); font-weight: 500; letter-spacing: -.055em; line-height: .98; }
@@ -95,3 +96,77 @@ h1 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(2
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 }
+
+.daily-card {
+  width: 100%;
+  padding: 16px;
+  border: 1px solid rgba(38, 40, 36, .09);
+  border-radius: 18px;
+  color: var(--ink);
+  background: rgba(255, 253, 249, .96);
+  box-shadow: 0 14px 36px rgba(60, 53, 42, .08);
+  backdrop-filter: blur(10px);
+}
+.daily-card-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+.daily-kicker { margin: 0 0 3px; color: var(--sage); font-size: .58rem; font-weight: 800; letter-spacing: .14em; }
+.daily-card-header h2 { margin: 0; font-family: Georgia, "Noto Serif SC", serif; font-size: 1.12rem; font-weight: 600; letter-spacing: -.02em; }
+.daily-count { flex: 0 0 auto; padding: 5px 9px; border-radius: 999px; color: #536e5b; background: #edf2ec; font-size: .75rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+.daily-list { margin: 0; padding: 0; list-style: none; }
+.daily-item { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; column-gap: 9px; padding: 10px 0 9px; border-bottom: 1px solid var(--line); }
+.daily-toggle { display: grid; place-items: center; width: 21px; height: 21px; margin-top: 1px; padding: 0; border: 1.5px solid #bbb7ad; border-radius: 50%; color: transparent; background: transparent; line-height: 1; transition: .2s; }
+.daily-toggle span { font-size: .75rem; }
+.daily-item.completed .daily-toggle { border-color: var(--sage); color: white; background: var(--sage); }
+.daily-content { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.daily-text { min-width: 0; overflow-wrap: anywhere; font-size: .82rem; line-height: 1.45; }
+.daily-item.completed .daily-text { color: #92958b; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.daily-duration { color: var(--muted); font-size: .7rem; }
+.daily-actions { grid-column: 2; display: flex; gap: 4px; margin-top: 3px; }
+.daily-text-button, .daily-edit-button, .daily-delete-button { min-height: 28px; padding: 3px 7px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; font-size: .72rem; }
+.daily-text-button:hover, .daily-edit-button:hover, .daily-delete-button:hover { color: var(--accent-dark); background: rgba(233, 111, 69, .07); }
+.daily-delete-button { color: #9a766b; }
+.daily-new-button { display: flex; align-items: center; gap: 5px; width: 100%; min-height: 36px; margin-top: 8px; padding: 4px 8px; border: 1px dashed #d5d0c5; border-radius: 9px; color: #617b68; background: transparent; font-size: .78rem; font-weight: 650; text-align: left; }
+.daily-new-button:hover { border-color: var(--sage); background: #f5f7f3; }
+.daily-new-button span { font-size: 1.1rem; }
+.daily-new-button:disabled { cursor: default; opacity: .45; }
+.daily-summary { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: .68rem; }
+.daily-summary span:first-child { color: #586f5d; font-weight: 700; }
+.daily-empty { padding: 18px 4px 8px; color: var(--muted); font-size: .78rem; line-height: 1.5; }
+.daily-empty p { margin: 0; }
+.daily-editor { display: grid; gap: 7px; margin-top: 12px; padding: 12px; border-radius: 12px; background: #f7f5ef; }
+.daily-editor h3 { margin: 0 0 2px; font-size: .88rem; }
+.daily-editor label { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.daily-editor input { width: 100%; min-width: 0; height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; outline: none; }
+.daily-editor input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(113, 137, 120, .14); }
+.daily-editor-error { min-height: 0; margin: 0; color: #b4442a; font-size: .73rem; }
+.daily-editor-error:empty { display: none; }
+.daily-editor-actions { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.daily-save-button { min-height: 34px; padding: 5px 14px; border: 0; border-radius: 9px; color: white; background: var(--accent); font-size: .76rem; font-weight: 700; }
+.daily-save-button:hover { background: var(--accent-dark); }
+.daily-undo-message { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 6px 8px; border-radius: 8px; color: #5c7061; background: #edf2ec; font-size: .72rem; }
+.daily-storage-error { margin-top: 10px; padding: 9px; border: 1px solid #edc8bc; border-radius: 9px; color: #8e3d2b; background: #fff5f0; font-size: .74rem; line-height: 1.45; overflow-wrap: anywhere; }
+.daily-storage-error p { margin: 0 0 4px; }
+.daily-storage-error p:empty { display: none; }
+.daily-status { min-height: 0; }
+.daily-card button:focus-visible { outline: 2px solid var(--sage); outline-offset: 2px; }
+@media (min-width: 1360px) {
+  .daily-card { position: absolute; top: 64px; right: 0; width: 248px; margin: 0; }
+}
+
+@media (max-width: 1359px) {
+  .page-shell { width: min(760px, calc(100% - 32px)); }
+  .main-column { width: 100%; }
+  .daily-card { position: static; width: 100%; margin: 0 0 22px; }
+  .daily-toggle { width: 44px; height: 44px; margin-top: 0; }
+  .daily-actions { min-height: 40px; align-items: center; }
+  .daily-edit-button, .daily-delete-button, .daily-text-button { min-height: 44px; padding-inline: 10px; }
+  .daily-new-button { min-height: 44px; }
+  .daily-save-button { min-height: 44px; padding-inline: 18px; }
+  .daily-editor input { min-height: 44px; }
+}
+
+@media (max-width: 600px) {
+  .page-shell { width: min(100% - 20px, 760px); }
+  .daily-toggle { margin-top: 0; }
+}
+
+[hidden] { display: none !important; }

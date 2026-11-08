@@ -6,59 +6,128 @@
     <meta name="theme-color" content="#f5f3ee" />
     <meta name="description" content="一个简洁、专注的本地 Todo List。" />
     <title>今日清单 · Todo List</title>
-    <link rel="stylesheet" href="styles.css?v=03f4735" />
+    <link rel="stylesheet" href="styles.css?v=daily-routines-1" />
   </head>
   <body>
     <main class="page-shell">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">MY DAILY FOCUS</p>
-          <h1>今日清单<span class="dot">.</span></h1>
-          <p id="today" class="date-line"></p>
-        </div>
-        <div class="progress-orbit" aria-label="完成进度">
-          <svg viewBox="0 0 72 72" aria-hidden="true">
-            <circle class="progress-track" cx="36" cy="36" r="30"></circle>
-            <circle id="progress-ring" class="progress-ring" cx="36" cy="36" r="30"></circle>
-          </svg>
-          <span id="progress-value">0%</span>
-        </div>
-      </header>
-
-      <section class="todo-card" aria-labelledby="list-title">
-        <h2 id="list-title" class="sr-only">任务列表</h2>
-        <form id="todo-form" class="add-form">
-          <label class="sr-only" for="todo-input">添加新任务</label>
-          <input id="todo-input" maxlength="120" autocomplete="off" placeholder="接下来要完成什么？" />
-          <button class="add-button" type="submit" aria-label="添加任务">
-            <span aria-hidden="true">＋</span><span>添加任务</span>
-          </button>
-        </form>
-        <p id="form-error" class="form-error" role="alert"></p>
-
-        <div class="toolbar">
-          <div class="filters" role="group" aria-label="筛选任务">
-            <button class="filter active" data-filter="all" type="button">全部</button>
-            <button class="filter" data-filter="active" type="button">待完成</button>
-            <button class="filter" data-filter="completed" type="button">已完成</button>
+      <div class="main-column">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">MY DAILY FOCUS</p>
+            <h1>今日清单<span class="dot">.</span></h1>
+            <p id="today" class="date-line"></p>
           </div>
-          <button id="clear-completed" class="text-button" type="button">清除已完成</button>
-        </div>
+          <div class="progress-orbit" aria-label="完成进度">
+            <svg viewBox="0 0 72 72" aria-hidden="true">
+              <circle class="progress-track" cx="36" cy="36" r="30"></circle>
+              <circle id="progress-ring" class="progress-ring" cx="36" cy="36" r="30"></circle>
+            </svg>
+            <span id="progress-value">0%</span>
+          </div>
+        </header>
 
-        <div id="empty-state" class="empty-state" hidden>
-          <div class="empty-icon" aria-hidden="true">✓</div>
-          <h3>这里很清爽</h3>
-          <p>写下一个小目标，开始今天的进度。</p>
-        </div>
-        <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
+        <aside id="daily-card" class="daily-card" aria-labelledby="daily-title">
+          <header class="daily-card-header">
+            <div>
+              <p class="daily-kicker">DAILY ROUTINE</p>
+              <h2 id="daily-title">每日必做</h2>
+            </div>
+            <span id="daily-count" class="daily-count" aria-label="当天完成数">0 / 4</span>
+          </header>
 
-        <footer class="summary">
-          <span id="remaining-count">0 项待完成</span>
-          <span id="completed-count">已完成 0 项</span>
-        </footer>
-      </section>
-      <p class="footnote">每完成一件小事，都离理想的一天更近。</p>
+          <p id="daily-status" class="sr-only" role="status" aria-live="polite"></p>
+          <div id="daily-storage-error" class="daily-storage-error" role="alert" hidden>
+            <p id="daily-storage-error-message"></p>
+            <button id="daily-restore-button" class="daily-text-button" type="button" hidden>
+              备份原数据并恢复默认
+            </button>
+          </div>
+
+          <ul id="daily-list" class="daily-list" aria-label="每日必做事项"></ul>
+          <div id="daily-empty" class="daily-empty" hidden>
+            <p>还没有每日必做事项。</p>
+            <p>添加后，它们会在每天重新打卡。</p>
+          </div>
+
+          <button id="daily-new-button" class="daily-new-button" type="button">
+            <span aria-hidden="true">＋</span> 新增事项
+          </button>
+
+          <form id="daily-editor-form" class="daily-editor" hidden>
+            <h3 id="daily-editor-heading">新增事项</h3>
+            <label for="daily-editor-text">事项内容</label>
+            <input
+              id="daily-editor-text"
+              name="text"
+              type="text"
+              maxlength="120"
+              autocomplete="off"
+              required
+            />
+            <label for="daily-editor-minutes">预计时长（分钟）</label>
+            <input
+              id="daily-editor-minutes"
+              name="minutes"
+              type="number"
+              min="1"
+              max="999"
+              step="1"
+              inputmode="numeric"
+              required
+            />
+            <p id="daily-editor-error" class="daily-editor-error" role="alert"></p>
+            <div class="daily-editor-actions">
+              <button class="daily-save-button" type="submit">保存</button>
+              <button id="daily-editor-cancel" class="daily-text-button" type="button">取消</button>
+            </div>
+          </form>
+
+          <div id="daily-undo-message" class="daily-undo-message" role="status" aria-live="polite" hidden>
+            <span>已删除此事项</span>
+            <button id="daily-undo-button" class="daily-text-button" type="button">撤销</button>
+          </div>
+
+          <footer class="daily-summary">
+            <span id="daily-minutes">预计 50 分钟</span>
+            <span>每日重新打卡</span>
+          </footer>
+        </aside>
+
+        <section class="todo-card" aria-labelledby="list-title">
+          <h2 id="list-title" class="sr-only">任务列表</h2>
+          <form id="todo-form" class="add-form">
+            <label class="sr-only" for="todo-input">添加新任务</label>
+            <input id="todo-input" maxlength="120" autocomplete="off" placeholder="接下来要完成什么？" />
+            <button class="add-button" type="submit" aria-label="添加任务">
+              <span aria-hidden="true">＋</span><span>添加任务</span>
+            </button>
+          </form>
+          <p id="form-error" class="form-error" role="alert"></p>
+
+          <div class="toolbar">
+            <div class="filters" role="group" aria-label="筛选任务">
+              <button class="filter active" data-filter="all" type="button">全部</button>
+              <button class="filter" data-filter="active" type="button">待完成</button>
+              <button class="filter" data-filter="completed" type="button">已完成</button>
+            </div>
+            <button id="clear-completed" class="text-button" type="button">清除已完成</button>
+          </div>
+
+          <div id="empty-state" class="empty-state" hidden>
+            <div class="empty-icon" aria-hidden="true">✓</div>
+            <h3>这里很清爽</h3>
+            <p>写下一个小目标，开始今天的进度。</p>
+          </div>
+          <ul id="todo-list" class="todo-list" aria-live="polite"></ul>
+
+          <footer class="summary">
+            <span id="remaining-count">0 项待完成</span>
+            <span id="completed-count">已完成 0 项</span>
+          </footer>
+        </section>
+        <p class="footnote">每完成一件小事，都离理想的一天更近。</p>
+      </div>
     </main>
-    <script type="module" src="app.js?v=03f4735"></script>
+    <script type="module" src="app.js?v=daily-routines-1"></script>
   </body>
 </html>
